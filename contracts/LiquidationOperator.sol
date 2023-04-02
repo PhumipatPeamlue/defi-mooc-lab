@@ -272,21 +272,20 @@ contract LiquidationOperator is IUniswapV2Callee {
     uint collateral_WBTC = WBTC.balanceOf(address(this));
     console.log("Collateral WBTC :", collateral_WBTC);
 
+    // 2.2 repay
 
-    // 2.2 Transfer WBTC to WETH
+    uint repay_WBTC = getAmountIn(debt_USDT, reserve_WBTC_Pool1, reserve_USDT_Pool1);
+    console.log("Repay WBTC :", repay_WBTC);
+    if(collateral_WBTC < repay_WBTC)    console.log("Lose in Transaction");
+    console.log("Profit in Transaction :",collateral_WBTC-repay_WBTC);
+    WBTC.transfer(address(uniswapV2Pair_WBTC_USDT), repay_WBTC);
+
+    // 2.3 Transfer WBTC to WETH
 
     uint profit_in_WBTC = WBTC.balanceOf(address(this));
     WBTC.transfer(address(uniswapV2Pair_WBTC_WETH), profit_in_WBTC);
     uint amountOut_WETH = getAmountOut(profit_in_WBTC, reserve_WBTC_Pool2, reserve_WETH_Pool2);
     uniswapV2Pair_WBTC_WETH.swap(0, amountOut_WETH, address(this), "");
-
-    // 2.3 repay
-
-    uint repay_WBTC = getAmountIn(debt_USDT, reserve_WBTC_Pool1, reserve_USDT_Pool1);
-    console.log("Repay WBTC :", repay_WBTC);
-    if(collateral_WBTC < repay_WBTC)    console.log("Lose in Transaction");
-    console.log("Profit in Transaction =",collateral_WBTC-repay_WBTC);
-    WBTC.transfer(address(uniswapV2Pair_WBTC_USDT), repay_WBTC);
 
     // END TODO
   }
